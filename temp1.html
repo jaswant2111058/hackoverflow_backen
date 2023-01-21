@@ -6,10 +6,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>HTML to PDF</title>
-  
-    
-       
-          <script src="https://unpkg.com/feather-icons"></script>
+   <script src="https://unpkg.com/feather-icons"></script>
           <link rel="stylesheet" href="style.css">
           <style>@import url('https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400;500;600;700&display=swap');
         
@@ -250,9 +247,23 @@
                     margin: 0 auto;
                 }
             }</style>
+       <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.min.js"></script>              
+       <script type="text/javascript" src="https://cdn.jsdelivr.net/gh/aadel112/googoose@master/jquery.googoose.js"></script>
        <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js" integrity="sha512-GsLlZN/3F2ErC5ifS5QtgpiJtWd43JWSuIgh7mbzZ8zBps+dvLusV+eNQATqgA/HdeKFVgA5v3S/cIrLF7QnIg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+       <script type="text/javascript">
+           
+       function download()
+       { 
+       $(document).ready(function() {
+           var o = {
+               filename: 'test.doc'
+           };
+           $(document).googoose(o);
+       });
+       }
+       </script>
       </head>
-       
+      <div  class="googoose-wrapper"> 
           <div id="txt" class="elem">
           <div class="container">
             <div class="profile">
@@ -430,9 +441,7 @@
           <script>
             feather.replace()
           </script>
-        </body>
-        
-        </html>
+          </div>
         
 
 
@@ -440,13 +449,13 @@
               
     <div class="html2pdf__page-break"></div>
     </div>
-
-
+  </div>
+  <button onclick="download()">download docs</button>
     <button class="download">Download PDF</button>
     <button id="test">Download Html</button>
     <script>
         var opt={
-        margin:[0,15,0,15],
+        margin:[-20,15,0,15],
         image:        { type: 'jpeg', quality: 10 },
         jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
         }

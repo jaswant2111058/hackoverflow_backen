@@ -271,7 +271,9 @@ function isLoggedIn(req, res, next) {
                 detail= detail.user_detail;
                 detail.push(user_detail);
                 await schema.updateOne({email:req.body.email},{user_detail:detail}) 
+                res.redirect("/resume/request/download")
            res.send({msg:detail})
+
         }
         catch (error) {
             res.status(400).send(error);
@@ -283,7 +285,7 @@ function isLoggedIn(req, res, next) {
                //const user_detail = req.body.detail
                 let user = await schema.findOne({email:req.body.email})
                 user= user.user_detail;
-                user.push(user_detail);
+               // user.push(user_detail);
                 await schema.updateOne({email:req.body.email},{user_detail:user}) 
 
            res.send({msg:detail})

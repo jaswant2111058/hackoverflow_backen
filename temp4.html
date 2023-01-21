@@ -16,7 +16,10 @@ $(document).ready(function() {
 }
 </script>
 <style>
-       
+   .buttons>button{
+	float: end;
+	
+   }    
     </style> 
 </head>
 
@@ -145,11 +148,13 @@ align-items: center;">
 
     </div>
 	</div>
+<div class="buttons">
 <button onclick="download()">download docs</button>
 <button onclick="pdfdownload()">download pdf</button>
 <button id="test">
 	download text
 </button>
+</div>
 <script>
 	 var opt={
         margin:[-10,22,2,22],
