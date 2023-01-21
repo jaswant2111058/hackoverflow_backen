@@ -6,20 +6,9 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>HTML to PDF</title>
-    <style>
-    </style>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js" integrity="sha512-GsLlZN/3F2ErC5ifS5QtgpiJtWd43JWSuIgh7mbzZ8zBps+dvLusV+eNQATqgA/HdeKFVgA5v3S/cIrLF7QnIg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-</head>
- 
-    <div class="elem">
-        <!DOCTYPE html>
-        <html lang="en">
-        
-        <head>
-          <meta charset="UTF-8">
-          <meta http-equiv="X-UA-Compatible" content="IE=edge">
-          <meta name="viewport" content="width=device-width, initial-scale=1.0">
-          <title>Resume</title>
+  
+    
+       
           <script src="https://unpkg.com/feather-icons"></script>
           <link rel="stylesheet" href="style.css">
           <style>@import url('https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400;500;600;700&display=swap');
@@ -261,13 +250,13 @@
                     margin: 0 auto;
                 }
             }</style>
-        </head>
-        
-        <body>
+       <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js" integrity="sha512-GsLlZN/3F2ErC5ifS5QtgpiJtWd43JWSuIgh7mbzZ8zBps+dvLusV+eNQATqgA/HdeKFVgA5v3S/cIrLF7QnIg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+      </head>
+       
+          <div id="txt" class="elem">
           <div class="container">
             <div class="profile">
-              <div class="profile_container">
-                
+              <div class="profile_container"> 
                 <div>
                   <h1 class="profile_name">
                     <span class="profile_name_firstName">Shaif</span>
@@ -454,6 +443,7 @@
 
 
     <button class="download">Download PDF</button>
+    <button id="test">Download Html</button>
     <script>
         var opt={
         margin:[0,15,0,15],
@@ -465,6 +455,18 @@
         btn.addEventListener('click', () => {
             html2pdf().from(div).set(opt).save()
         })
+        function download_txt() {
+          let div = document.querySelector(".elem"); 
+  var textToSave = document.getElementById('txt').innerHTML;
+  var hiddenElement = document.createElement('a');
+
+  hiddenElement.href = 'data:attachment/text,' + encodeURI(textToSave);
+  hiddenElement.target = '_blank';
+  hiddenElement.download = 'myFile.txt';
+  hiddenElement.click();
+}
+
+document.getElementById('test').addEventListener('click', download_txt);
     </script> 
 </body>
  

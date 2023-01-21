@@ -294,13 +294,14 @@ function isLoggedIn(req, res, next) {
     })
 
     app.get("/resume/request/download", isLoggedIn, async (req,res)=>{
-       try{
        
+        try{
         const temp = req.body.temp;
         let user = await schema.findOne({email:req.body.email})
-        user= user.user_detail.pop();
+        console.log(user)
+         user= user.user_detail.pop();
         if(temp=="1")
-        {
+        {       console.log(user)
             res.render("temp1",{user:user})
         }
         else if(temp=="2")
@@ -313,13 +314,13 @@ function isLoggedIn(req, res, next) {
         }
         else
         {
-            res.render("temp4",{user:user})
+            res.render("temp4")
         }
     }
-    catch{
-        res.status(400).send({msg:"error"})
+    catch
+    {
+        res.send("error").status(400)
     }
-        
     })
 
 

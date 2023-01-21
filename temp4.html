@@ -2,7 +2,7 @@
 <head>
 <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.min.js"></script>              
 <script type="text/javascript" src="https://cdn.jsdelivr.net/gh/aadel112/googoose@master/jquery.googoose.js"></script>
-
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js" integrity="sha512-GsLlZN/3F2ErC5ifS5QtgpiJtWd43JWSuIgh7mbzZ8zBps+dvLusV+eNQATqgA/HdeKFVgA5v3S/cIrLF7QnIg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 <script type="text/javascript">
     
 function download()
@@ -22,7 +22,7 @@ $(document).ready(function() {
 
 <body>
 <div  class="googoose-wrapper"> 
-    
+   <div id="txt" class="elem">
 <body style="background-color: rgb(253, 254, 255);
 display: flex;
 justify-content: center;
@@ -144,7 +144,35 @@ align-items: center;">
     </div>
 
     </div>
-<button onclick="download()">download</button>
+	</div>
+<button onclick="download()">download docs</button>
+<button onclick="pdfdownload()">download pdf</button>
+<button id="test">
+	download text
+</button>
+<script>
+	 var opt={
+        margin:[-10,22,2,22],
+        jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+        }
+        let div = document.querySelector(".elem");
+        let btn = document.querySelector(".download");
+        function pdfdownload() {
+            html2pdf().from(div).set(opt).save()
+        }
+	 function download_txt() {
+          let div = document.querySelector(".elem"); 
+  var textToSave = document.getElementById('txt').innerHTML;
+  var hiddenElement = document.createElement('a');
+
+  hiddenElement.href = 'data:attachment/text,' + encodeURI(textToSave);
+  hiddenElement.target = '_blank';
+  hiddenElement.download = 'myFile.txt';
+  hiddenElement.click();
+}
+
+document.getElementById('test').addEventListener('click', download_txt);
+</script>
 </body>
 </html>
 

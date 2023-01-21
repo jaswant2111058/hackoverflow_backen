@@ -8,7 +8,11 @@
     <title>HTML to PDF</title>
     <style>
     </style>
+    <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.min.js"></script>              
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/gh/aadel112/googoose@master/jquery.googoose.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js" integrity="sha512-GsLlZN/3F2ErC5ifS5QtgpiJtWd43JWSuIgh7mbzZ8zBps+dvLusV+eNQATqgA/HdeKFVgA5v3S/cIrLF7QnIg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script type="text/javascript">
+   // <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js" integrity="sha512-GsLlZN/3F2ErC5ifS5QtgpiJtWd43JWSuIgh7mbzZ8zBps+dvLusV+eNQATqgA/HdeKFVgA5v3S/cIrLF7QnIg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 </head>
  
     <div class="elem">
@@ -270,10 +274,10 @@
                 
                 <div>
                   <h1 class="profile_name">
-                    <span class="profile_name_firstName"><%=detail.FName %></details></span>
-                    <span class="profile_name_lastName"><%=detail.LName %></span>
+                    <span class="profile_name_firstName"><%=user.FName %></details></span>
+                    <span class="profile_name_lastName"><%=user.LName %></span>
                   </h1>
-                  <p class="profile_title"><%=detail.JTitle %></p>
+                  <p class="profile_title"><%=user.JTitle %></p>
                   <p class="description profile_description">
                     Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et
                     dolore
@@ -286,8 +290,8 @@
               <div class="skills">
                 <h3 class="title">Expertise</h3>
                 <ul class="skills_list description">
-                  <li><%=detail.Skills.skill %></li>
-                  <li><%=detail.Skills.Conf %>/li>
+                  <li><%=user.Skills.skill %></li>
+                  <li><%=user.Skills.Conf %>/li>
                   
                 </ul>
               </div>
