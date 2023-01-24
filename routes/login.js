@@ -1,259 +1,148 @@
-const express = require('express');
-const app = express();
-require('dotenv').config();
-const session = require('express-session');
-const passport = require('passport');
-const port = process.env.PORT || 5000;
-require('../auth');
-app.use(express.json());
-app.use(express.urlencoded({ extended: false }));
+const express = require("express");
+const router = express.Router();
 const schema = require("../model/model")
+router.use(express.json());
+router.use(express.urlencoded({extended:false}));
 const cookiejk = require("cookie-parser");
-const bodyParser = require("body-parser")
+const bodyParser= require("body-parser")
 const jwt = require("jsonwebtoken");
 const key = process.env.SESSION_SECRET;
-const time = 1000 * 15 * 60;
-app.use(cookiejk());
-app.use(bodyParser.urlencoded({ extended: true }));
-var nodemailer = require('nodemailer');
-const { findOne } = require('../model/model');
-let otpsend = process.env.OTP;
-let useremail = process.env.EMAIL;
+const time = 1000*15*60;
+router.use(cookiejk());
+router.use(bodyParser.urlencoded({ extended: true }));
+const sendmail = require("../nodemailer/mailer")
 
-//--------------------------mail sending function----------------------------------------
-function sendmail(email) {
-    const random = Math.floor(Math.random() * 99999) + 10000;
 
-    console.log(random);
-    var transporter = nodemailer.createTransport({
-        service: 'gmail',
-        auth: {
-            user: "jkstar0123@gmail.com",
-            pass: process.env.EMAIL_PASS,
-        }
-    })
-    var mailOptions = {
-        from: 'jkstar0123@gmail.com',
-        to: `${email}`,
-        subject: 'registor email verification',
-        text: `OTP IS ${random}`
-    }
-    transporter.sendMail(mailOptions, function (error, info) {
-        if (error) {
-            console.log(error);
-        } else {
-            console.log('Email sent: ' + info.response);
-        }
-    })
-    return random;
+
+
+//signup post
+
+router.post('/signup',async(req,res)=>{
+const pass = req.body.password;
+const repass= req.body.repassword;
+//const adnew= schema.findOne(res.body.email)
+if(pass===repass)
+{
+  const detail ={ user_email:req.body.email,password:pass,user_name:req.body.username,email_status:"notverified"}
+ 
+  try{
+    const usr= new schema(detail)
+    const adnew = await usr.save();
+    //req.otp=sendmail(req.body.email);
+  
+    //res.render("otpverification",{email:req.body.email})
+   // console.log(req.otp)
+    res.send({msg : "signup successful redirect to the login page"})
+     }
+  catch
+  {
+    res.status(400).send({msg:"email is all ready register"+"<html><br><br><a href='/'>return<a></html>"});
+  }
+
+ 
 }
 
-//------------------------------google passport-----------------------------------------//
-app.get('/auth/google',
-    passport.authenticate('google', { scope: ['email', 'profile'] }
-    ));
-app.use(session({ secret: "jassi", resave: false, saveUninitialized: true }));
-app.use(passport.initialize());
-app.use(passport.session());
-//--------------------------------------middleware------------------------------------------------//
-function isLoggedIn(req, res, next) {
+else{
+  res.send({msg:"entered password is not matching"+"<html><br><br><a href='/'>return<a></html>"})
+  }
+  
+   
+})
 
-    if (req.user || useremail) {
-        next();
 
+//otp verification
+
+router.post("/otpverification",async(req,res)=>{
+
+     console.log(req.otp)
+    if(req.otp==req.body.otp)
+    {
+      await schema.updateOne({user_email:req.body.email},{email_status:"verified"});
+      res.send({msg : "otp verified"})
+    }
+    else
+    {
+      res.send({msg:"otp is not matching"})
+
+    }
+
+})
+
+
+//login post
+
+router.post("/login", async (req, res) => {
+
+try {
+    const lemail = req.body.email
+    const lpassword = req.body.password
+
+    const semail = await schema.findOne({ user_email: lemail })
+    if(semail&& semail.email_status===true)
+    {
+   // res.send(semail)
+   // const pcheck = await bcrypt.compare(lpassword, semail.password)
+
+    if (lpassword!=semail.password) {
+
+        res.send( {msg:"password not match"} );
     }
     else {
-        res.send({
-            msg: "not autharaised"
-        })
+            const token = jwt.sign({email:semail.email,id:semail._id},key)
+             res.cookie("token", token, {
+            expires: new Date(Date.now() + time),
+              httpOnly: true})
+              console.log(token);
+              useremail=lemail;
+              res.send({msg:`user logged in`,email:`${lemail}`})    
     }
+  }
+  else
+  res.send({msg:"Email is not register"+"<html><br><br><a href='/'>signup<a></html>"})
 }
 
-    //------------------------------google call back-----------------------------------------------//
-
-    app.get('/auth/google/callback',
-        passport.authenticate('google', {
-            successRedirect: '/googlelogin',
-            failureRedirect: '/auth/google/failure'
-        })
-    );
+catch (e) {
+    res.status(400).send(e);
+}
+})
 
 
-    //------------------------------api-----------------------------------------------//
-
-
-    //login get
-
-    app.get("/", (req, res) => {
-
-        res.render("login")
-    })
-
-
-    //signup get
-
-    app.get("/signup", (req, res) => {
-
-        res.render("signup")
-    })
-
-
-    //signup post
-
-    app.post('/signup', async (req, res) => {
-        let pass = req.body.password;
-        try {
-            bcrypt.hash(pass, 12, async function (err, hash) {
-                pass = hash;
-            })
+//forget password get
 
 
 
-            const detail = { email: req.body.email, password: pass, name: req.body.username, email_status: false }
+// forget password post
+
+router.post("/forgetpassword",async(req,res)=>{
+const semail = await schema.findOne({ user_email: req.body.email })
+if(!semail)
+{
+res.send({msg:"Email is not register"+"<html><br><br><a href='/'>signup<a></html>"})
+}
+else
+{
+  sendmail(req.body.email);
+
+res.render("fov",{email:req.body.email})
+}
+
+})
 
 
-            const usr = new schema(detail)
-            const adnew = await usr.save();
-            const otp = sendmail(req.body.email);
-            otpsend = `${otp}`;
-            res.send({ msg: "otp send to " + req.body.email })
-        }
-        catch
-        {
-            res.status(400).send({ msg: "email is all ready register" });
-        }
-    })
+//forget password otp verification
 
+router.post("/fov",async(req,res)=>{
 
-    //otp verification
+     
+if(otp===req.body.otp)
+{
+await schema.updateOne({user_email:req.body.email},{password:req.body.password});
+res.redirect("/")
+}
+else
+{
+res.send({msg :"otp is not matching"+"<html><br><br><a href='/'>signup<a></html>"})
+}
+})
 
-    app.post("/otpverification", async (req, res) => {
-
-
-        if (otpsend === req.body.otp) {
-            await schema.updateOne({ user_email: req.body.email }, { email_status: true });
-            res.send({ msg: "password changed return to the login page" })
-        }
-        else {
-            res.send({ msg: "otp is not matching" })
-
-        }
-
-    })
-
-
-    //login post
-
-    app.post("/login", async (req, res) => {
-
-        try {
-            const lemail = req.body.email
-            const password = req.body.password
-
-            const semail = await schema.findOne({ user_email: lemail })
-            const pass_verification = await bcrypt.compare(password, semail.password)
-            if (!pass_verification) {
-                res.send({
-                    msg: "password is not matching or email"
-                })
-            }
-            else {
-                const token = jwt.sign({ email: semail.email }, key)
-                res.cookie("token", token, {
-                    expires: new Date(Date.now() + time),
-                    httpOnly: true
-                })
-                console.log(token);
-                useremail = lemail;
-                res.send({
-                    msg: "user successfuly logged in"
-                })
-            }
-        }
-
-        catch (e) {
-            res.status(400).send(e);
-        }
-    })
-
-
-    app.post("/forgetpassword", async (req, res) => {
-        const semail = await schema.findOne({ email: req.body.email })
-        if (!semail) {
-            res.send({ msg: "email is not register" })
-        }
-        else {
-            const otp = sendmail(req.body.email);
-            otpsend = `${otp}`;
-            res.send({ msg: "otp send to email " + req.body.email })
-        }
-
-    })
-
-
-    //forget password otp verification
-
-    app.post("/fov", async (req, res) => {
-
-        let pass = req.body.password;
-
-        bcrypt.hash(pass, 12, async function (err, hash) {
-            pass = hash;
-        })
-
-        if (otpsend === req.body.otp) {
-            await schema.updateOne({ user_email: req.body.email }, { password: pass });
-            res.send({ msg: "password changes" })
-        }
-        else {
-            res.send({ msg: "otp is not matching" })
-
-        }
-
-    })
-
-
-    //google passport login
-
-    app.get("/googlelogin", isLoggedIn, async (req, res) => {
-        useremail = req.user.email;
-        const semail = await schema.findOne({ email: req.user.email })
-        if (!semail) {
-            try {
-                const detail = { name: req.user.displayName, email: req.user.email, status: "verified" }
-
-                const usr = new schema(detail);
-                const adnew = await usr.save();
-                // res.status(201).send(adnew);
-                res.send({ msg: "user logged in" });
-            }
-            catch (error) {
-                res.status(400).send(error);
-            }
-        }
-        else {
-            res.send({ msg: "user logged in" });
-        }
-    })
-
-    app.post("/resume/save",isLoggedIn, async (req,res)=>
-    {
-            try{
-                const user_detail = req.body.detail
-                let detail = await schema.findOne({email:useremail})
-                detail= detail.detail;
-                detail=detail.push(user_detail);
-                await schema.updateOne({email:detail.email},{detail:detail})
-
-
-            }
-            catch{
-
-            }
-    })
-
-
-
-
-
-    app.listen(port, () => console.log("server is up....."))
+module.exports = router;
